@@ -1,0 +1,102 @@
+import turtle as trtl
+import random
+
+# Global variables
+score = 0
+time_left = 10  # You can adjust the total time here
+
+
+def start_game():
+    global score, time_left
+
+    # Create the turtle that will be clicked
+    turt = trtl.Turtle()
+
+    # Turtles for displaying score and time
+    scoreKeeper = trtl.Turtle()
+    timeKeeper = trtl.Turtle()
+    scoreKeeper.hideturtle()
+    timeKeeper.hideturtle()
+
+    # Move score/time turtles to positions
+    teleportation(scoreKeeper, [0, 370])
+    teleportation(timeKeeper, [0, 340])
+
+    # Initial display of score and time
+    font_setup = ("Arial", 20, "normal")
+    text_update(scoreKeeper, score, "Your score: ", font_setup)
+    text_update(timeKeeper, time_left, "Time left: ", font_setup)
+
+    # Set up the game window
+    wind = trtl.Screen()
+    wind.screensize(800, 800)
+    wind.title("Catch-A-Turtle Game")
+    wind.bgcolor("lightblue")
+
+    # Handle turtle clicks and countdown timer
+    wind.onscreenclick(lambda x, y: on_turtle_click(turt, scoreKeeper, font_setup))
+    countdown(timeKeeper, font_setup)
+
+    # Start the event loop
+    wind.mainloop()
+
+
+def on_turtle_click(turt, scoreKeeper, font_setup):
+    """Increases score and randomizes the turtle's appearance/position on click."""
+    global score
+    score += 1  # Increment score
+    scoreKeeper.clear()  # Clear the previous score
+    text_update(scoreKeeper, score, "Your score: ", font_setup)  # Update score display
+    randomize(turt)  # Randomize turtle's shape, color, and size
+    teleportation(turt, [random.randint(-300, 300), random.randint(-300, 300)])  # Move turtle
+
+    # Get the turtle's current coordinates
+    current_x = turt.xcor()
+    current_y = turt.ycor()
+    stamp(current_x, current_y)
+    print(f"Stamp at: ({current_x}, {current_y})")  # Print coordinates
+
+
+def countdown(timeKeeper, font_setup):
+    """Decreases the timer every second until it reaches zero."""
+    global time_left
+    if time_left > 0:
+        time_left -= 1  # Decrease time
+        timeKeeper.clear()  # Clear previous time
+        text_update(timeKeeper, time_left, "Time left: ", font_setup)  # Update time display
+#should not have used that lambda 
+        trtl.Screen().ontimer(lambda: countdown(timeKeeper, font_setup), 1000)  # Call again in 1 second
+    else:
+        timeKeeper.clear()
+        timeKeeper.write("Game Over!", font=font_setup, align="center")
+
+
+def text_update(keeper, value, phrase, font_setup):
+    """Writes text to a turtle screen."""
+    keeper.write(f"{phrase}{value}", font=font_setup, align="center")
+
+
+def randomize(turt):
+    """Randomizes the turtle's shape, color, and size."""
+    turtle_shapes = ["arrow", "turtle", "circle", "square", "triangle", "classic"]
+    turtle_colors = ["red", "blue", "green", "orange", "purple", "gold"]
+
+    turt.shape(random.choice(turtle_shapes))
+    turt.color(random.choice(turtle_colors))
+    turt.shapesize(random.randint(1, 3), random.randint(1, 3), random.randint(1, 3))
+
+def stamp(x, y):
+    stamp = trtl.Turtle()
+    teleportation(stamp, [x, y])
+    stamp.shape("sqaure")
+    stamp.color("black")
+
+def teleportation(turt, cords):
+    """Moves the turtle to the specified coordinates without drawing."""
+    turt.penup()
+    turt.goto(cords[0], cords[1])
+    turt.pendown()
+
+
+if __name__ == "__main__":
+    start_game()
